@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kun.demo.mapper.DeptMapper">
+
+    <sql id="all-columns">
+        select
+            dept_no,
+            dept_name,
+            db_no
+        from
+            t_dept
+    </sql>
+
+    <insert id="insertOne" useGeneratedKeys="true" keyProperty="deptNo">
+        insert into
+            t_dept (dept_name, db_no)
+        values
+            (#{deptName}, DATABASE())
+    </insert>
+
+    <select id="selectById" resultType="com.kun.demo.entity.Dept">
+        <include refid="all-columns"/>
+        where dept_no = #{id}
+    </select>
+
+    <select id="selectAll" resultType="com.kun.demo.entity.Dept">
+        <include refid="all-columns"/>
+    </select>
+
+</mapper>

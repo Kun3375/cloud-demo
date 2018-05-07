@@ -1,0 +1,28 @@
+server:
+  port: 9001
+
+spring:
+  application:
+    name: cloud-consumer
+
+# 配置简化处理
+eureka:
+  instance:
+    # eureka 体系下的实例名称，默认为 <host>:<application.name>:<port>
+    instance-id: ${spring.application.name}-${server.port}
+  client:
+    # eureka-server 地址，可以配置多个 zone，每个 zone 下可以配置多个 eureka-server 地址，逗号分隔
+    # 默认注册地址为：defaultZone: http://localhost:8761/eureka/
+    # 启用注册中心安全认证的时候地址需要为 http://<username>:<password>@<host>:<port>/<suffix>
+    # 通常需要配置上所有的 eureka-server
+    service-url:
+      defaultZone: http://eureka-server-one:8761/eureka/,http://eureka-server-two:8762/eureka/
+
+# ribbon 可以针对不同的服务配置不同的负载均衡客户端
+# 使用 <serviceName>.<nameSpace>.<key>=<value>，不指定 serviceName 时作为全局配置
+# 默认 nameSpace 为 ribbon，具体 key 可选值参考 com.netflix.client.config.CommonClientConfigKey
+# 同样可以采用 @RibbonClients / @RibbonClient + @Configuration 配置不同客户端 rule，ping 等具体规则
+#CLOUD-PROVIDER:
+#  ribbon:
+#    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+

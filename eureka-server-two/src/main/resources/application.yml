@@ -1,0 +1,32 @@
+server:
+  port: 8762
+
+spring:
+  application:
+    # spring 应用名称，同时也作为微服务的名称
+    name: eureka-server
+
+
+eureka:
+  instance:
+    # eureka 体系下的实例名称，默认为 <host>:<application.name>:<port>
+    instance-id: ${spring.application.name}-${server.port}
+  # eureka-server 本身也作为一个 eureka-client
+  # eureka 的高可用通过多个 eureka-server 相互注册，共享服务列表来实现
+  client:
+    # 向 eureka-server 注册 / 从 eureka-server 拉取注册的服务列表
+    # 两项默认为 true，不需要要改动，每个服务都不能为 false，包括集群下的 eureka-server
+    register-with-eureka: true
+    fetch-registry: true
+    # eureka-server 地址，可以配置多个 zone，每个 zone 下可以配置多个 eureka-server 地址，逗号分隔
+    # 默认注册地址为：defaultZone: http://localhost:8761/eureka/
+    # 启用注册中心安全认证的时候地址需要为 http://<username>:<password>@<host>:<port>/<suffix>
+    # 通常需要配置上所有的 eureka-server
+    # 每个 eureka-server 需要配置其他 server 的地址
+    service-url:
+      defaultZone: http://${spring.application.name}-one:8761/eureka/
+  # server-server 端特有配置项
+  server:
+    # eureka-server 自我保护，默认为 true
+    # 15 分钟（默认）内心跳失败比例超过 85%（默认），会保护注册信息而不会立即移除
+    enable-self-preservation: true
