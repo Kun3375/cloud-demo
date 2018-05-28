@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import rx.Observable;
@@ -76,6 +76,7 @@ public class DeptServiceImpl implements DeptService {
     @Override
     @HystrixCommand(fallbackMethod = "queryOneDefault")
     public Dept queryOne(Long id) {
+        // 用于测试
         if (id == 1L) {
             throw new RuntimeException("测试异常");
         }
@@ -84,24 +85,18 @@ public class DeptServiceImpl implements DeptService {
 
     @Override
     @HystrixCommand(fallbackMethod = "queryAllDefault")
-    public Observable<List> queryAll() {
-        return Observable.unsafeCreate(subscriber -> {
-            try {
-                if (subscriber.isUnsubscribed()) {
-                    List<Dept> deptList = restTemplate.
-                            exchange(
-                                    DEPT_PROVIDER_URL_PREFIX + "/list",
-                                    HttpMethod.GET,
-                                    null,
-                                    new ParameterizedTypeReference<List<Dept>>() {})
-                            .getBody();
-                    subscriber.onNext(deptList);
-                    subscriber.onCompleted();
-                }
-            } catch (Exception e) {
-                subscriber.onError(e);
-            }
-        });
+    public List<Dept> queryAll() {
+        return restTemplate
+                .exchange(
+                        // url
+                        DEPT_PROVIDER_URL_PREFIX + "/list",
+                        // method
+                        HttpMethod.GET,
+                        // request body and header, could be null
+                        RequestEntity.EMPTY,
+                        // typeReference
+                        new ParameterizedTypeReference<List<Dept>>() {})
+                .getBody();
     }
 
     /*

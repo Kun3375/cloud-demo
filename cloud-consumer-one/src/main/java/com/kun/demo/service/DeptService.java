@@ -16,5 +16,5 @@ public interface DeptService {
 
     Dept queryOne(Long id);
 
-    Observable<List> queryAll();
+    List<Dept> queryAll();
 }
