@@ -14,7 +14,7 @@ public interface DeptService {
 
     Long addOne(Dept dept);
 
-    Dept queryOne(Long id);
+    Dept queryOne(Dept dept);
 
     List<Dept> queryAll();
 }

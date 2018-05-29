@@ -2,6 +2,7 @@ package com.kun.demo.controller;
 
 import com.kun.demo.entity.Dept;
 import com.kun.demo.service.DeptService;
+import com.netflix.hystrix.strategy.concurrency.HystrixRequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -20,9 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/ribbon")
 public class RibbonController {
-    
-    private static final String DEPT_PROVIDER_URL_PREFIX = "http://CLOUD-PROVIDER" + "/dept";
-    
+
     @Autowired
     private DeptService deptService;
     @Autowired
@@ -35,7 +34,11 @@ public class RibbonController {
     
     @GetMapping("/dept/one/{id}")
     public Dept queryOne(@PathVariable("id") Long id) {
-        return deptService.queryOne(id);
+        HystrixRequestContext.initializeContext();
+        deptService.queryOne(new Dept().setDeptNo(id));
+        deptService.queryOne(new Dept().setDeptNo(id));
+        deptService.queryOne(new Dept().setDeptNo(id + 1));
+        return deptService.queryOne(new Dept().setDeptNo(id + 1));
     }
     
     @GetMapping("/dept/list")

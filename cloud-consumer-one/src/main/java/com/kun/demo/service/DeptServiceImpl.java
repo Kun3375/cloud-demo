@@ -2,6 +2,8 @@ package com.kun.demo.service;
 
 import com.kun.demo.entity.Dept;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.cache.annotation.CacheKey;
+import com.netflix.hystrix.contrib.javanica.cache.annotation.CacheResult;
 import com.netflix.hystrix.contrib.javanica.command.AbstractHystrixCommand;
 import com.netflix.hystrix.contrib.javanica.command.GenericSetterBuilder;
 import com.netflix.hystrix.contrib.javanica.command.HystrixCommandBuilder;
@@ -9,10 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import rx.Observable;
 
 import java.util.Collections;
 import java.util.List;
@@ -48,6 +50,7 @@ public class DeptServiceImpl implements DeptService {
 
     }
 
+    // --------------------------------------- 启用断路保护 -----------------------------------------
     /*
      * @HystrixCommand 注解方法的全部功能都可以通过自定义类，并继承 HystrixCommand / HystrixObservableCommand 来实现
      * See AbstractDeptCommand.class / DeptObservableCommand.class
@@ -73,14 +76,37 @@ public class DeptServiceImpl implements DeptService {
      * RxJava 响应式编程：使用 Observable<V> 作为返回值，observableExecutionMode 属性对应不同的调用
      */
 
+    // ----------------------------------- 启用请求缓存 --------------------------------------------
+    /*
+     * 缓存单元其实是以 command 区分的，不同 command 不会影响或使用其他的缓存
+     * @CacheResult 标记该方法结果需要缓存，需要配合 @HystrixCommand，cacheKeyMethod 指定缓存方法
+     * @CacheRemove 标记该方法触发缓存清理，commandKey 标记清理的 command，cacheKeyMethod 得到需要清理的 key
+     * @CacheKey 用来在缓存 / 清理方法的参数上标注，确定使用该参数作为缓存 key，
+     *           可以使用对象属性名作为 key，如 @CacheKey("name") Dept dept
+     *           可以使用复合属性如 @CacheKey("address.city") Dept dept，city 为空会忽略，address 为空则 key = ""
+     *           如果没有该注解，默认使用全部参数，如果使用了 cacheKeyMethod 属性，该注解不生效
+     */
+
+    // ----------------------------------- 启用请求合并 --------------------------------------------
+    /*
+     * @HystrixCollapser 注解方法的全部功能都可以通过自定义类，并继承 HystrixCollapser 来实现
+     */
+
+    /*
+     * 使用 @HystrixCollapser 可以使用请求合并，批量执行
+     */
+
     @Override
     @HystrixCommand(fallbackMethod = "queryOneDefault")
-    public Dept queryOne(Long id) {
+    @CacheResult(cacheKeyMethod = "cacheDept")
+    public Dept queryOne(Dept dept) {
+        // @CacheKey 并不会生效
         // 用于测试
-        if (id == 1L) {
+        if (dept.getDeptNo() == 1L) {
             throw new RuntimeException("测试异常");
         }
-        return restTemplate.getForObject(DEPT_PROVIDER_URL_PREFIX + "/one/{id}", Dept.class, id);
+        log.info("send request... id：{}", dept.getDeptNo());
+        return restTemplate.getForObject(DEPT_PROVIDER_URL_PREFIX + "/one/{id}", Dept.class, dept.getDeptNo());
     }
 
     @Override
@@ -106,13 +132,19 @@ public class DeptServiceImpl implements DeptService {
      * 如果方法作为 defaultFallback，不允许有任何参数，返回值必须兼容 @HystrixCommand 方法
      */
 
-    private Dept queryOneDefault(Long id, Throwable t) {
-        log.info("id: {}, a exception occurred: {}", id, t.getMessage());
+    private Dept queryOneDefault(Dept dept, Throwable t) {
+        log.info("id: {}, a exception occurred: {}", dept.getDeptNo(), t.getMessage());
         return new Dept().setDeptNo(-1L);
     }
 
     private List<Dept> queryAllDefault() {
+        log.info("queryAll, err...");
         return Collections.emptyList();
+    }
+
+    private String cacheDept(Dept dept) {
+        log.info("通过缓存获取 key，dept：{}，key：{}",dept , dept.getDeptNo());
+        return dept.getDeptNo().toString();
     }
 
 }
