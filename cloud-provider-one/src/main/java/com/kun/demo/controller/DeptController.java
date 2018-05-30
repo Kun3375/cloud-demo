@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author CaoZiye
@@ -32,6 +34,17 @@ public class DeptController {
     public Dept queryOne(@PathVariable("id") Long id) {
         log.info("received a request for query a dept by id...");
         return deptService.selectById(id);
+    }
+
+    @GetMapping("/list/{ids}")
+    public List<Dept> queryBatch(@PathVariable("ids") String ids) {
+        log.info("received a request batch, id: {}", ids);
+        List<Dept> result = Stream.of(ids.split(","))
+                .map(Long::parseLong)
+                .map(deptService::selectById)
+                .collect(Collectors.toList());
+        log.info("request batch result：{}", result);
+        return result;
     }
     
     @GetMapping("/list")

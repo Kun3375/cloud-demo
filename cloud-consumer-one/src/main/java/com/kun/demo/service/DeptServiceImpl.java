@@ -1,12 +1,15 @@
 package com.kun.demo.service;
 
 import com.kun.demo.entity.Dept;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCollapser;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import com.netflix.hystrix.contrib.javanica.cache.annotation.CacheKey;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
+import com.netflix.hystrix.contrib.javanica.cache.annotation.CacheRemove;
 import com.netflix.hystrix.contrib.javanica.cache.annotation.CacheResult;
 import com.netflix.hystrix.contrib.javanica.command.AbstractHystrixCommand;
 import com.netflix.hystrix.contrib.javanica.command.GenericSetterBuilder;
 import com.netflix.hystrix.contrib.javanica.command.HystrixCommandBuilder;
+import com.netflix.hystrix.contrib.javanica.conf.HystrixPropertiesManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 /**
  * @author CaoZiye
@@ -33,11 +38,12 @@ public class DeptServiceImpl implements DeptService {
     private RestTemplate restTemplate;
 
     @Override
+    @CacheRemove(commandKey = "queryOne")
     public Long addOne(Dept dept) {
         HystrixCommandBuilder builder = HystrixCommandBuilder.builder()
                 .setterBuilder(GenericSetterBuilder.builder()
                         .groupKey("dept")
-                        .commandKey("add")
+                        .commandKey("addOne")
                         .build())
                 .build();
 
@@ -87,17 +93,8 @@ public class DeptServiceImpl implements DeptService {
      *           如果没有该注解，默认使用全部参数，如果使用了 cacheKeyMethod 属性，该注解不生效
      */
 
-    // ----------------------------------- 启用请求合并 --------------------------------------------
-    /*
-     * @HystrixCollapser 注解方法的全部功能都可以通过自定义类，并继承 HystrixCollapser 来实现
-     */
-
-    /*
-     * 使用 @HystrixCollapser 可以使用请求合并，批量执行
-     */
-
     @Override
-    @HystrixCommand(fallbackMethod = "queryOneDefault")
+    @HystrixCommand(fallbackMethod = "queryOneDefault", groupKey = "dept")
     @CacheResult(cacheKeyMethod = "cacheDept")
     public Dept queryOne(Dept dept) {
         // @CacheKey 并不会生效
@@ -109,8 +106,52 @@ public class DeptServiceImpl implements DeptService {
         return restTemplate.getForObject(DEPT_PROVIDER_URL_PREFIX + "/one/{id}", Dept.class, dept.getDeptNo());
     }
 
+    // ----------------------------------- 启用请求合并 --------------------------------------------
+    /*
+     * @HystrixCollapser 注解方法的全部功能都可以通过自定义类，并继承 HystrixCollapser 来实现
+     */
+
+    /*
+     * 使用 @HystrixCollapser 可以使用请求合并，批量执行
+     * ！！！因为在一个作用域内，所有该方法的请求在窗口期（默认10ms）都会被合并，所有方法本身不能和 @HystrixCommand 一起使用
+     * ！！！原因同上，批量方法需要 @HystrixCommand 同时使用
+     * ！！！窗口期会很大程度上影响请求的速度。
+     * ！！！即使在 scope=REQUEST 的情况下，同一线程多次访问该方法，并不会合并（每次都会被阻塞），所以可以使用 Future 等方式
+     * calapserKey: 合并请求的 key，默认为标注的方法名
+     * batchMethod：用于批量请求的方法名称，批量方法需要在同一个类下，并且入参和出参都是 java.util.List，泛型也匹配单次方法的入参
+     * scope：作用域，当前请求还是全局
+     * collapserProperties：具体配置属性，参考 HystrixPropertiesManager
+     *
+     */
+
     @Override
-    @HystrixCommand(fallbackMethod = "queryAllDefault")
+    @HystrixCollapser(batchMethod = "queryBatch", collapserProperties = {
+            @HystrixProperty(name = HystrixPropertiesManager.TIMER_DELAY_IN_MILLISECONDS, value = "100")
+    })
+    public Future<Dept> queryOneToBatch(Long id) {
+        throw new RuntimeException("can not be invoked");
+    }
+
+    @HystrixCommand(groupKey = "dept")
+    public List<Dept> queryBatch(List<Long> ids) {
+        log.info("send request batch... ids：{}", ids);
+        List<Dept> result = restTemplate
+                .exchange(
+                        DEPT_PROVIDER_URL_PREFIX + "/list/{1}",
+                        HttpMethod.GET,
+                        RequestEntity.EMPTY,
+                        new ParameterizedTypeReference<List<Dept>>() {
+                        },
+                        ids.stream()
+                                .map(Object::toString)
+                                .collect(Collectors.joining(",")))
+                .getBody();
+        log.info("batch request result：{}", result);
+        return result;
+    }
+
+    @Override
+    @HystrixCommand(fallbackMethod = "queryAllDefault", groupKey = "dept")
     public List<Dept> queryAll() {
         return restTemplate
                 .exchange(
@@ -121,7 +162,8 @@ public class DeptServiceImpl implements DeptService {
                         // request body and header, could be null
                         RequestEntity.EMPTY,
                         // typeReference
-                        new ParameterizedTypeReference<List<Dept>>() {})
+                        new ParameterizedTypeReference<List<Dept>>() {
+                        })
                 .getBody();
     }
 
@@ -143,7 +185,7 @@ public class DeptServiceImpl implements DeptService {
     }
 
     private String cacheDept(Dept dept) {
-        log.info("通过缓存获取 key，dept：{}，key：{}",dept , dept.getDeptNo());
+        log.info("通过缓存获取 key，dept：{}，key：{}", dept, dept.getDeptNo());
         return dept.getDeptNo().toString();
     }
 

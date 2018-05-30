@@ -3,9 +3,6 @@ package com.kun.demo.controller;
 import com.kun.demo.entity.Dept;
 import com.kun.demo.service.feign.DeptService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

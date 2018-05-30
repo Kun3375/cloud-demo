@@ -1,9 +1,9 @@
 package com.kun.demo.service;
 
 import com.kun.demo.entity.Dept;
-import rx.Observable;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * @author CaoZiye
@@ -15,6 +15,8 @@ public interface DeptService {
     Long addOne(Dept dept);
 
     Dept queryOne(Dept dept);
+
+    Future<Dept> queryOneToBatch(Long id);
 
     List<Dept> queryAll();
 }
