@@ -9,7 +9,7 @@ import java.util.concurrent.Future;
  * @author CaoZiye
  * @version 1.0 2018/5/7 23:02
  */
-public interface DeptService {
+public interface RibbonDeptService {
 
 
     Long addOne(Dept dept);

@@ -25,4 +25,6 @@ eureka:
 #CLOUD-PROVIDER:
 #  ribbon:
 #    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
-
+#CLOUD-PROVIDER:
+#  ribbon:
+#    ReadTimeout=2000

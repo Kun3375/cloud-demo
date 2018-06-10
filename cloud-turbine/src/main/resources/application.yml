@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: cloud-turbine
+
+server:
+  port: 3000
+management:
+  server:
+    port: 3001
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server-one:8761/eureka/,http://eureka-server-two:8762/eureka/
+
+turbine:
+  # 需要监控的服务名称
+  app-config: CLOUD-CONSUMER
+  # turbine 聚合集群的名称
+  cluster-name-expression: default
+  # 主机加端口区分服务，便于伪集群的形式
+  combine-host-port: true

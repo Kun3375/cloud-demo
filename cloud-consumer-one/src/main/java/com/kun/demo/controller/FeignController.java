@@ -1,7 +1,7 @@
 package com.kun.demo.controller;
 
 import com.kun.demo.entity.Dept;
-import com.kun.demo.service.feign.DeptService;
+import com.kun.demo.service.FeignDeptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +16,7 @@ import java.util.List;
 public class FeignController {
 
     @Autowired
-    private DeptService deptService;
+    private FeignDeptService deptService;
 
     @PostMapping("/dept/one")
     public Long addOne(@RequestBody Dept dept) {

@@ -13,6 +13,8 @@
         <module>cloud-provider-one</module>
         <module>cloud-consumer-one</module>
         <module>hystrix-dashboard</module>
+        <module>cloud-turbine</module>
+        <module>cloud-gateway</module>
     </modules>
     <packaging>pom</packaging>
 

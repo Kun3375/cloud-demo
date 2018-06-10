@@ -1,7 +1,7 @@
 package com.kun.demo.controller;
 
 import com.kun.demo.entity.Dept;
-import com.kun.demo.service.DeptService;
+import com.kun.demo.service.RibbonDeptService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class RibbonController {
 
     private static final Logger log = LoggerFactory.getLogger(RibbonController.class);
     @Autowired
-    private DeptService deptService;
+    private RibbonDeptService deptService;
     @Autowired
     private DiscoveryClient discoveryClient;
 

@@ -29,9 +29,9 @@ import java.util.stream.Collectors;
  * @version 1.0 2018/5/7 23:03
  */
 @Service
-public class DeptServiceImpl implements DeptService {
+public class RibbonDeptServiceImpl implements RibbonDeptService {
 
-    private static final Logger log = LoggerFactory.getLogger(DeptServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(RibbonDeptServiceImpl.class);
     private static final String DEPT_PROVIDER_URL_PREFIX = "http://CLOUD-PROVIDER" + "/dept";
 
     @Autowired

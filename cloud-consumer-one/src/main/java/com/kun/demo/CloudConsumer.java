@@ -11,7 +11,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @version 1.0 2018/5/1 9:10
  */
 @ServletComponentScan(basePackageClasses = HystrixRequestFilter.class)
-@EnableFeignClients(basePackages = "com.kun.demo.service.feign")
+@EnableFeignClients(basePackages = "com.kun.demo.service")
 @SpringCloudApplication
 public class CloudConsumer {
 

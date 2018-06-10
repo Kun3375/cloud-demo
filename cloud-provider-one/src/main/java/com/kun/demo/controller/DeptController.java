@@ -16,21 +16,20 @@ import java.util.stream.Stream;
  * @version 1.0 2018/4/30 15:24
  */
 @RestController
-@RequestMapping("/dept")
-public class DeptController {
+public class DeptController implements com.kun.demo.service.feign.DeptService {
 
     private static final Logger log = LoggerFactory.getLogger(DeptController.class);
 
     @Autowired
     private DeptService deptService;
 
-    @PostMapping("/one")
+    @Override
     public Long addOne(@RequestBody Dept dept) {
         log.info("received a request for add dept...");
         return deptService.insertOne(dept);
     }
 
-    @GetMapping("/one/{id}")
+    @Override
     public Dept queryOne(@PathVariable("id") Long id) {
         log.info("received a request for query a dept by id...");
         return deptService.selectById(id);
@@ -47,7 +46,7 @@ public class DeptController {
         return result;
     }
 
-    @GetMapping("/list")
+    @Override
     public List<Dept> queryAll() {
         log.info("received a request for query all dept...");
         return deptService.selectAll();

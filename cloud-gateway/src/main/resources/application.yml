@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: cloud-gateway
+
+server:
+  port: 5555
+
+# 向 eureka 注册之后可以使用面向服务的方式进行路由
+eureka:
+  instance:
+    instance-id: ${spring.application.name}-${server.port}
+  client:
+    service-url:
+      defaultZone: http://eureka-server-one:8761/eureka/,http://eureka-server-two:8762/eureka/
+
+
+# 传统路由方案
+#zuul:
+#  routes:
+#    dept:
+#      path: /dept/**
+#      url: http://localhost:8001
+
+# 面向服务的路由方案（并且有线程隔离和断路保护和负载均衡）
+zuul:
+  # 网关前缀
+  prefix: /api
+  # 路由时去除网关前缀（当然这是默认的）
+  strip-prefix: true
+  # 匹配方式是线性遍历，需要注意书写顺序
+  routes:
+    # 以下配置方式等同
+#    CLOUD-PROVIDER: /dept_provider/**
+    dept-p:
+      path: /dept_provider/**
+      service-id: CLOUD-PROVIDER
+    local-test:
+      path: /local-test/**
+      url: forward:/local
+      # 可以允许敏感头信息的方案
+      custom-sensitive-headers: true
+      sensitive-headers:
+    # 在 eureka 引入后，默认会有服务名前缀的路由
+    # 例子：CLOUD-PROVIDER: /cloud-provider/**
+#    dept-c:
+#      path: /dept_consumer/**
+#      service-id: CLOUD-CONSUMER
+  # 避免自动创建的路由，可以使用（* 代表全部）
+#  ignored-services: *
+  # 不进行路由的规则
+  ignored-patterns: /**/go/**
+  # "Cookie", "Set-Cookie", "Authorization" 在默认情况下视为敏感的头部信息
+  # 使用以下配置可以自定义全局敏感头，敏感头部信息不会被路由时携带
+#  sensitive-headers:
+  # 是否代理 Host 头的请求，解决重定向的一些问题
+  add-host-header: true
