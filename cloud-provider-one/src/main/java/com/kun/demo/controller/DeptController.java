@@ -23,13 +23,13 @@ public class DeptController {
 
     @Autowired
     private DeptService deptService;
-    
+
     @PostMapping("/one")
     public Long addOne(@RequestBody Dept dept) {
         log.info("received a request for add dept...");
         return deptService.insertOne(dept);
     }
-    
+
     @GetMapping("/one/{id}")
     public Dept queryOne(@PathVariable("id") Long id) {
         log.info("received a request for query a dept by id...");
@@ -46,7 +46,7 @@ public class DeptController {
         log.info("request batch result：{}", result);
         return result;
     }
-    
+
     @GetMapping("/list")
     public List<Dept> queryAll() {
         log.info("received a request for query all dept...");

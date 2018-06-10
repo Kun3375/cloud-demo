@@ -13,21 +13,21 @@ import java.util.List;
  */
 @Service
 public class DeptServiceImpl implements DeptService {
-    
+
     @Autowired
     private DeptMapper deptMapper;
-    
+
     @Override
     public Long insertOne(Dept dept) {
         deptMapper.insertOne(dept);
         return dept.getDeptNo();
     }
-    
+
     @Override
     public Dept selectById(Long id) {
         return deptMapper.selectById(id);
     }
-    
+
     @Override
     public List<Dept> selectAll() {
         return deptMapper.selectAll();

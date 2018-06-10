@@ -21,7 +21,8 @@ management:
     web:
       # choose endpoints be exposed
       exposure:
-        include: ["health","info"]
+        # like ["health","info"] or ["*"]
+        include: "*"
   endpoint:
     health:
       # sometimes may need more details

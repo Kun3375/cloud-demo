@@ -56,6 +56,17 @@ public class DeptServiceImpl implements DeptService {
 
     }
 
+    // --------------------------------------- 配置优先级 -----------------------------------------
+    /*
+     * 配置优先级 从低到高分别是：
+     * 1.全局默认值：Hystrix 代码中定义
+     * 2.全局配置值：通过配置文件调整属性默认值。于启动时覆盖全局默认值，或者配合 Bus / Config 动态调整
+     * 3.实例默认值：代码为实例定义的属性值
+     * 4.实例配置值：通过配置文件调整实例的属性值。于启动时覆盖默认值，或者配合 Bus / Config 动态调整
+     *
+     * 具体属性名称参看 HystrixPropertiesManager
+     */
+
     // --------------------------------------- 启用断路保护 -----------------------------------------
     /*
      * @HystrixCommand 注解方法的全部功能都可以通过自定义类，并继承 HystrixCommand / HystrixObservableCommand 来实现
@@ -69,8 +80,8 @@ public class DeptServiceImpl implements DeptService {
      * groupKey：指定方法的分组名称，用于统计报告等，默认方法所在（运行期）类名
      * commandKey：指定方法的命令名称，主要和缓存相关，不同的 commandKey 使用不同的缓存池，默认为方法名，command 实现时默认为类名
      * HystrixThreadPool：指定对应的进程池，在缺省的情况下使用 groupKey 作进程池区分
-     * commandProperties：
-     * threadPoolProperties：
+     * commandProperties：参看 HystrixPropertiesManager
+     * threadPoolProperties：参看 HystrixPropertiesManager
      * observableExecutionMode：LAZY -> toObservable()，EAGER -> observable()
      * ignoreExceptions：指定忽略的异常，通常除了 HystrixRuntimeException，任何异常产生都会被判定为执行失败，执行服务降级逻辑。
      * raiseHystrixExceptions：对应上条，也可以指定触发服务降级的异常，默认情况下 RuntimeException 都会触发

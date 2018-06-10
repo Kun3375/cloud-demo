@@ -27,12 +27,12 @@ public class RibbonController {
     private DeptService deptService;
     @Autowired
     private DiscoveryClient discoveryClient;
-    
+
     @PostMapping("/dept/one")
     public Long addOne(@RequestBody Dept dept) {
         return deptService.addOne(dept);
     }
-    
+
     @GetMapping("/dept/one/{id}")
     public Dept queryOne(@PathVariable("id") Long id) {
         deptService.queryOne(new Dept().setDeptNo(id));
@@ -55,18 +55,18 @@ public class RibbonController {
         }
         return result;
     }
-    
+
     @GetMapping("/dept/list")
     public List<Dept> queryAll() {
         return deptService.queryAll();
     }
-    
+
     @GetMapping("/discovery/test")
     public Object testDiscovery() {
         // all services
         List<String> serviceList = discoveryClient.getServices();
         serviceList.forEach(System.out::println);
-        
+
         // test cloud-provider
         List<ServiceInstance> instanceList = discoveryClient.getInstances("CLOUD-PROVIDER");
         for (ServiceInstance instance : instanceList) {
@@ -75,8 +75,8 @@ public class RibbonController {
             System.out.print(instance.getPort() + "\t");
             System.out.println(instance.getUri() + "\t");
         }
-        
+
         return this.discoveryClient;
     }
-    
+
 }

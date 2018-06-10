@@ -13,13 +13,13 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class Dept {
-    
+
     @JsonProperty("dept_no")
     private Long deptNo;
-    
+
     @JsonProperty("dept_name")
     private String deptName;
-    
+
     @JsonProperty("db_no")
     private String dbNo;
 

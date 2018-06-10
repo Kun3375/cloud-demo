@@ -1,4 +1,4 @@
-package com.kun.demo.filter;
+package com.kun.demo.addtional;
 
 import com.netflix.hystrix.strategy.concurrency.HystrixRequestContext;
 
@@ -11,7 +11,7 @@ import java.io.IOException;
  * @version 1.0 2018/5/30 21:39
  */
 @WebFilter(filterName = "hystrixFilter", urlPatterns = "/*", asyncSupported = true)
-public class HystrixFilter implements Filter {
+public class HystrixRequestFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) {

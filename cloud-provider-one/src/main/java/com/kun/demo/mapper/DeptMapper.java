@@ -11,11 +11,11 @@ import java.util.List;
  */
 @Mapper
 public interface DeptMapper {
-    
+
     void insertOne(Dept dept);
-    
+
     Dept selectById(Long id);
-    
+
     List<Dept> selectAll();
-    
+
 }

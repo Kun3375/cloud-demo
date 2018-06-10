@@ -4,18 +4,18 @@
 
     <sql id="all-columns">
         select
-            dept_no,
-            dept_name,
-            db_no
+        dept_no,
+        dept_name,
+        db_no
         from
-            t_dept
+        t_dept
     </sql>
 
     <insert id="insertOne" useGeneratedKeys="true" keyProperty="deptNo">
         insert into
-            t_dept (dept_name, db_no)
+        t_dept (dept_name, db_no)
         values
-            (#{deptName}, DATABASE())
+        (#{deptName}, DATABASE())
     </insert>
 
     <select id="selectById" resultType="com.kun.demo.entity.Dept">
