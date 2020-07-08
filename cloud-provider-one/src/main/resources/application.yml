@@ -5,6 +5,21 @@ spring:
   application:
     # spring 应用名称，同时也作为微服务的名称
     name: cloud-provider
+  sleuth:
+    enabled: false
+    sampler:
+      # 采样率
+      probability: 1
+  zipkin:
+    enabled: false
+    # 默认使用 web rest 接口上报信息
+    #    base-url: http://localhost:9411
+    # 可以选择 rabbit、kafka 等
+    sender:
+      type: rabbit
+    rabbitmq:
+      addresses: localhost:5672
+      queue: zipkin
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     url: jdbc:mysql:///cloud_demo

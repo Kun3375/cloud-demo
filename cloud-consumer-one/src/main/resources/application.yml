@@ -4,6 +4,27 @@ server:
 spring:
   application:
     name: cloud-consumer
+  cloud:
+    # 目前客户端负载均衡作为接口，不再强依赖 ribbon，可以进行关闭，默认实现 BlockingLoadBalancerClient
+    loadbalancer:
+      ribbon:
+        enabled: false
+  sleuth:
+    enabled: false
+    sampler:
+      # 采样率
+      probability: 0.5
+  zipkin:
+    enabled: false
+    # 默认使用 web rest 接口上报信息
+#    base-url: http://localhost:9411
+    # 可以选择 rabbit、kafka 等
+    sender:
+      type: rabbit
+    rabbitmq:
+      addresses: localhost:5672
+      queue: zipkin
+
 
 # 配置简化处理
 eureka:
