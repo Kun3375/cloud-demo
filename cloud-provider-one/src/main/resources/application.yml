@@ -7,8 +7,7 @@ spring:
     name: cloud-provider
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql:///demo_01
+    url: jdbc:mysql:///cloud_demo
     username: root
     password: 3375
   http:
@@ -40,12 +39,18 @@ info:
     version: @project.version@
   metadata:
 
-mybatis:
-  mapper-locations:
-  - classpath:mybatis/mapper/**/*.xml
+mybatis-plus:
+  mapper-locations: classpath*:/mybatis/mapper/**/*.xml
   type-aliases-package: com.kun.**.entity
   configuration:
     map-underscore-to-camel-case: true
+
+#mybatis:
+#  mapper-locations:
+#  - classpath:mybatis/mapper/**/*.xml
+#  type-aliases-package: com.kun.**.entity
+#  configuration:
+#    map-underscore-to-camel-case: true
 
 eureka:
   instance:
@@ -66,5 +71,5 @@ eureka:
     # 启用注册中心安全认证的时候地址需要为 http://<username>:<password>@<host>:<port>/<suffix>
     # 通常需要配置上所有的 eureka-server
     service-url:
-      defaultZone: http://eureka-server-one:8761/eureka/,http://eureka-server-two:8762/eureka/
+      defaultZone: http://localhost:8761/eureka/,http://localhost:8762/eureka/
 

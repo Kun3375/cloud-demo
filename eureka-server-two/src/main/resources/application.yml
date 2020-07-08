@@ -24,7 +24,7 @@ eureka:
     # 通常需要配置上所有的 eureka-server
     # 每个 eureka-server 需要配置其他 server 的地址
     service-url:
-      defaultZone: http://${spring.application.name}-one:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
   # server-server 端特有配置项
   server:
     # eureka-server 自我保护，默认为 true

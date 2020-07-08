@@ -1,0 +1,53 @@
+server:
+  port: 11010
+
+spring:
+  application:
+    name: stream-provider
+  # rabbit config (单一集群配置，否则使用 binders 列表)
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+  cloud:
+    stream:
+      # 默认绑定， 默认取决于引入的 rabbit or kafka
+      default-binder: demo
+      # 如果只依赖了一种消息，直接指定对应的消息组件类型配置即可
+      rabbit:
+        # 这里是配置指定通道（消费者/生产者）对于 rabbit 的特殊配置，需要熟悉 rabbit
+        bindings:
+          output:
+            producer:
+              compress: true
+      # 多个绑定器（不通的消息中间件或者相同类型不同集群的消息中间件），需要通过名字区分配置
+      binders:
+        # binder 名称，用来区分各集群配置。修改默认配置时指定 rabbit 即可，需要配合 spring.cloud.stream.rabbit.bindings.CHANNEL.binder
+        demo:
+          type: rabbit
+          # 暂未定性
+          environment:
+            spring:
+              rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+      # 多个绑定器时候分开指定属性
+      bindings:
+        # 指定通道名称分别配置，这是 Source 默认的通道名
+        output:
+          # exchange name
+          destination: cloudDemo
+          # contentType: text/plain ...
+          content-type: application/json
+          # 指定 binder 的名称
+          binder: demo
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}-${server.port}
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/,http://localhost:8762/eureka/
